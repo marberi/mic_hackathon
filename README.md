@@ -16,5 +16,14 @@ reduces sensitivity to rotation, reflecting the underlying physical symmetries
 of the data. This leads to more physically meaningful clustering, including
 continuous grain-boundary regions with non-zero spatial extent.
 
+## How to use
 
+The `train_encoder` notebook (jupytext format) trains an autoencoder on 4D-STEM
+data, both with and without the rotational loss. The resulting latent features
+can then be clustered using HDBSCAN and visualized with the `create_map`
+notebook for comparison.
 
+## Disclaimer
+
+Some file paths are currently hardcoded. Please update them as needed for your
+local setup.
