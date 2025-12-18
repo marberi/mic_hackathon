@@ -15,9 +15,11 @@
 
 # %%
 from matplotlib import pyplot as plt
+import pandas as pd
 from pathlib import Path
 from tqdm.notebook import tqdm
 import hdbscan
+from matplotlib.colors import LogNorm
 
 import torch
 from torch.utils.data import DataLoader
@@ -96,10 +98,11 @@ def cluster_samples(inp, Nmin=60):
     return cluster_id_map
 
 
-# %%
+# %% [markdown]
+# ## Estimate the clusters.
 
 # %%
-ver = 4
+ver = 5
 net1 = load_network(ver, rot_loss=False)
 net2 = load_network(ver, rot_loss=True)
 
@@ -108,21 +111,70 @@ feat1 = find_features(net1, loader)
 feat2 = find_features(net2, loader)
 
 # %%
-cluster1 = cluster_samples(feat1)
-cluster2 = cluster_samples(feat2)
+# %%time
+Nmin = 60
+cluster1 = cluster_samples(feat1, Nmin=Nmin)
+cluster2 = cluster_samples(feat2, Nmin=Nmin)
+
+# %% [markdown]
+# ## Create a map of the classes.
 
 # %%
-fig, A = plt.subplots(ncols=2, sharey=True)
-fig.set_size_inches([10, 4.5])
+# Estimating the variance. Just loading again to have on a different format.
+imgs_in = data.load_data(path)
+imgs = torch.Tensor(imgs_in)
 
+# Plotting the variance to compare.
+std = imgs.std(dim=[2,3])
+X = std**2
+S = pd.Series(X.flatten())
+vmax = S.quantile(0.99)
+
+# %%
+fig, A = plt.subplots(ncols=3, sharey=True)
+fig.set_size_inches([20, 5.5])
+
+fs = 20
 ax = A[0]
 ax.imshow(cluster1, origin='lower')
-ax.set_title('Default', fontsize=15)
+ax.set_title('Default', fontsize=fs)
 
 ax = A[1]
 ax.imshow(cluster2, origin='lower')
-ax.set_title('Rotation-invariant latent constraint', fontsize=15)
+ax.set_title('Rotation-invariant latent constraint', fontsize=fs)
 
-plt.savefig('figs/clusters_v2.pdf')
+ax = A[2]
+ax.imshow(X, vmax=vmax, origin='lower')
+ax.set_title('Variance in reciprocal space', fontsize=fs)
+#plt.savefig('figs/clusters_v6.pdf')
+
+# %% [markdown]
+# ## Plotting the diffraction pattern for different classes.
+
+# %%
+cl_list = set(cluster2.flatten())
+
+# %%
+# These will change if running again... Yes, fun!
+#cl_list = [0, 4, -1]
+
+cl_list = [1, 2, -1]
+
+# %%
+fig, A = plt.subplots(nrows=2, ncols=len(cl_list), sharex='row', sharey='row')
+fig.set_size_inches([20, 10])
+
+for i,cl_id in tqdm(enumerate(cl_list)):
+    mask = torch.Tensor(1*(cluster2 == cl_id))
+    tmp = (mask[:,:,None,None]*imgs).sum(dim=[0,1]) / mask.sum()
+    
+    ax = A[0,i]
+    ax.imshow(1*(mask == 1), origin='lower', cmap="Blues", alpha=0.7) #, alpha=0.4)
+    #ax.set_title(f'ID: {cl_id}')
+    
+    ax = A[1,i]
+    ax.imshow(tmp, origin='lower', norm=LogNorm(), cmap='plasma')
+
+plt.savefig('figs/cluster_regions_v3.pdf')
 
 # %%
