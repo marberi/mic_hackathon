@@ -24,6 +24,7 @@ import numpy as np
 from pathlib import Path
 from tqdm.notebook import tqdm
 
+import torch
 from torch import optim
 from torch.utils.data import DataLoader
 import torchvision.transforms.functional as F
@@ -41,7 +42,7 @@ path = d / 'scan_x256_y256.raw'
 
 # Where to store the trained model.
 d_models = Path('/data/incaem/common/eriksen/hackathon/models')
-ver = 4
+ver = 5
 
 # If including the rotational loss.
 rot_loss = True
@@ -74,7 +75,7 @@ def loss_recon(bimgs, pred):
 # %%
 net = net.train()
 
-for epoch in range(Nepocs):
+for epoch in range(Nepochs):
     L = []
     for bimg in tqdm(loader):
         optimizer.zero_grad()
@@ -109,3 +110,5 @@ for epoch in range(Nepocs):
 # %%
 # Storing the state.
 torch.save(net.state_dict(), d_models / f'model_angle_{lbl}_v{ver}.pt')
+
+# %%
