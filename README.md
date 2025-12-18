@@ -1,3 +1,6 @@
+# Disclaimer
+The architecture defined in model.py, initially generated with assistance from ChatGPT, was previously tested on a different sample prior to the hackathon and is reused here.
+
 # Latent-Constrained Autoencoder for Unsupervised Clustering of 4D-STEM Data
 
 Autoencoders are a standard approach for dimensionality reduction and representation learning. In this project, we explore 
@@ -16,7 +19,7 @@ reduces sensitivity to rotation, reflecting the underlying physical symmetries
 of the data. This leads to more physically meaningful clustering, including
 continuous grain-boundary regions with non-zero spatial extent.
 
-## How to use
+# How to use
 The required Python packages are listed in the `requirements` file and can be
 installed using conda.
 
@@ -25,7 +28,10 @@ data, both with and without the rotational loss. The resulting latent features
 can then be clustered using HDBSCAN and visualized with the `create_map`
 notebook for comparison.
 
-## Disclaimer
-
 Some file paths are currently hardcoded. Please update them as needed for your
 local setup.
+
+# Acknowledgements
+This works has been supported by Port d’Informació Científica (PIC) and the
+InCAEM project providing computational resources. We thank Thermo Fisher or
+whoever was sponsoring the pizza.
