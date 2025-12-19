@@ -77,4 +77,4 @@ class ConvAutoencoder(nn.Module):
     def forward(self, x):
         z = self.enc(x)
         x_hat = self.dec(z)
-        return self.out_act(x_hat)
+        return self.out_act(x_hat), z
